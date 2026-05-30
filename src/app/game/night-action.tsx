@@ -63,14 +63,6 @@ export default function NightActionScreen() {
     return (
       <NightGate
         playerName={currentNightActor.name}
-        subtitle={
-          <>
-            <RoleIcon role={currentNightActor.role} size={14} color="#6040A0" />
-            <Text style={{ fontSize: 14, color: '#6040A0', fontWeight: '500', textTransform: 'uppercase', letterSpacing: 1.5 }}>
-              {ROLE_LABELS[currentNightActor.role]}
-            </Text>
-          </>
-        }
         onReady={() => setIsReady(true)}
       />
     );
