@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { Role } from '@/game/types';
-import { ROLE_EMOJI } from '@/game/constants';
+import { RoleIcon } from '@/components/game/icons';
 
 interface Props {
   name: string;
@@ -24,11 +24,15 @@ export function PlayerAvatar({ name, isAlive, size = 48, showRole = false, role 
       <View style={[styles.circle, { width: size, height: size, borderRadius: size / 2 }]}>
         <Text style={[styles.initials, { fontSize: size * 0.35 }]}>{initials}</Text>
       </View>
-      <Text style={[styles.name, !isAlive && styles.deadText]} numberOfLines={1}>
-        {showRole && role ? `${ROLE_EMOJI[role]} ` : ''}
-        {name}
-        {!isAlive ? ' †' : ''}
-      </Text>
+      <View style={styles.nameRow}>
+        {showRole && role && (
+          <RoleIcon role={role} size={12} color="#A080C0" />
+        )}
+        <Text style={[styles.name, !isAlive && styles.deadText]} numberOfLines={1}>
+          {name}
+          {!isAlive ? ' †' : ''}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -51,6 +55,11 @@ const styles = StyleSheet.create({
   initials: {
     color: '#E8D5FF',
     fontWeight: '700',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   name: {
     color: '#E8D5FF',

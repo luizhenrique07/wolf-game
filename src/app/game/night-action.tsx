@@ -6,7 +6,8 @@ import { useGame } from '@/game/context';
 import { NightGate } from '@/components/game/night-gate';
 import { ActionTargetList } from '@/components/game/action-target-list';
 import type { PlayerId } from '@/game/types';
-import { ROLE_LABELS, ROLE_EMOJI, NIGHT_ACTION_INSTRUCTIONS } from '@/game/constants';
+import { ROLE_LABELS, NIGHT_ACTION_INSTRUCTIONS } from '@/game/constants';
+import { RoleIcon } from '@/components/game/icons';
 
 export default function NightActionScreen() {
   const { state, dispatch, alivePlayers, currentNightTurn, currentNightActor } = useGame();
@@ -62,7 +63,14 @@ export default function NightActionScreen() {
     return (
       <NightGate
         playerName={currentNightActor.name}
-        subtitle={`${ROLE_EMOJI[currentNightActor.role]} ${ROLE_LABELS[currentNightActor.role]}`}
+        subtitle={
+          <>
+            <RoleIcon role={currentNightActor.role} size={14} color="#6040A0" />
+            <Text style={{ fontSize: 14, color: '#6040A0', fontWeight: '500', textTransform: 'uppercase', letterSpacing: 1.5 }}>
+              {ROLE_LABELS[currentNightActor.role]}
+            </Text>
+          </>
+        }
         onReady={() => setIsReady(true)}
       />
     );
@@ -97,9 +105,10 @@ export default function NightActionScreen() {
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.roleLabel}>
-            {ROLE_EMOJI[currentNightActor.role]} {ROLE_LABELS[currentNightActor.role]}
-          </Text>
+          <View style={styles.roleLabelRow}>
+            <RoleIcon role={currentNightActor.role} size={16} color="#6A4A9A" />
+            <Text style={styles.roleLabel}>{ROLE_LABELS[currentNightActor.role]}</Text>
+          </View>
           <Text style={styles.actorName}>{currentNightActor.name}</Text>
           <Text style={styles.instruction}>
             {NIGHT_ACTION_INSTRUCTIONS[currentNightTurn.actionType]}
@@ -132,6 +141,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#080510' },
   container: { flex: 1, paddingHorizontal: 24, paddingVertical: 32, gap: 20 },
   header: { gap: 6 },
+  roleLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   roleLabel: { fontSize: 13, color: '#6A4A9A', textTransform: 'uppercase', letterSpacing: 2 },
   actorName: { fontSize: 28, color: '#E8D5FF', fontWeight: '800' },
   instruction: { fontSize: 16, color: '#8060A0', lineHeight: 24, marginTop: 4 },

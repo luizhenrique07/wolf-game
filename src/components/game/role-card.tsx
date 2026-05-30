@@ -7,8 +7,9 @@ import Animated, {
   interpolate,
 } from 'react-native-reanimated';
 import type { Role } from '@/game/types';
-import { ROLE_LABELS, ROLE_DESCRIPTIONS, ROLE_EMOJI, TEAM_LABELS } from '@/game/constants';
+import { ROLE_LABELS, ROLE_DESCRIPTIONS, TEAM_LABELS } from '@/game/constants';
 import { ROLE_TEAM } from '@/game/types';
+import { RoleIcon } from '@/components/game/icons';
 
 interface Props {
   role: Role;
@@ -52,7 +53,7 @@ export function RoleCard({ role, revealed, onReveal }: Props) {
 
       <Animated.View style={[styles.card, styles.back, backStyle]}>
         <View style={styles.cardInner}>
-          <Text style={styles.emoji}>{ROLE_EMOJI[role]}</Text>
+          <RoleIcon role={role} size={56} color="#E8D5FF" />
           <Text style={styles.roleName}>{ROLE_LABELS[role]}</Text>
           <View style={[styles.teamBadge, team === 'wolves' ? styles.wolfTeam : styles.villageTeam]}>
             <Text style={styles.teamText}>{TEAM_LABELS[team]}</Text>
@@ -106,9 +107,6 @@ const styles = StyleSheet.create({
     color: '#7C5CBF',
     fontSize: 14,
     textAlign: 'center',
-  },
-  emoji: {
-    fontSize: 56,
   },
   roleName: {
     fontSize: 28,

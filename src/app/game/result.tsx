@@ -11,8 +11,9 @@ import Animated, {
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/game/context';
-import { ROLE_LABELS, ROLE_EMOJI, TEAM_LABELS } from '@/game/constants';
+import { ROLE_LABELS, TEAM_LABELS } from '@/game/constants';
 import { ROLE_TEAM } from '@/game/types';
+import { RoleIcon, WolfIcon, VillagerIcon } from '@/components/game/icons';
 
 function WinnerBanner({ winner }: { winner: 'wolves' | 'village' }) {
   const scale = useSharedValue(0.5);
@@ -32,7 +33,11 @@ function WinnerBanner({ winner }: { winner: 'wolves' | 'village' }) {
 
   return (
     <Animated.View style={[styles.banner, isWolves ? styles.bannerWolf : styles.bannerVillage, style]}>
-      <Text style={styles.bannerEmoji}>{isWolves ? '🐺' : '🏘️'}</Text>
+      {isWolves ? (
+        <WolfIcon size={64} color={isWolves ? '#E04040' : '#40C060'} />
+      ) : (
+        <VillagerIcon size={64} color="#40C060" />
+      )}
       <Text style={styles.bannerTitle}>{TEAM_LABELS[winner]}</Text>
       <Text style={styles.bannerSubtitle}>{isWolves ? 'wins!' : 'wins!'}</Text>
     </Animated.View>
@@ -59,7 +64,7 @@ export default function ResultScreen() {
           {state.players.map((p, idx) => (
             <View key={p.id} style={[styles.playerRow, !p.isAlive && styles.playerRowDead]}>
               <View style={styles.playerInfo}>
-                <Text style={styles.playerEmoji}>{ROLE_EMOJI[p.role]}</Text>
+                <RoleIcon role={p.role} size={24} color={p.isAlive ? '#A080C0' : '#5A3A8A'} />
                 <View>
                   <Text style={[styles.playerName, !p.isAlive && styles.playerNameDead]}>
                     {p.name}
@@ -100,7 +105,6 @@ const styles = StyleSheet.create({
   },
   bannerWolf: { backgroundColor: '#2A0505', borderColor: '#8B2020' },
   bannerVillage: { backgroundColor: '#052A0A', borderColor: '#1A7A2A' },
-  bannerEmoji: { fontSize: 64 },
   bannerTitle: { fontSize: 32, color: '#E8D5FF', fontWeight: '900', letterSpacing: -0.5 },
   bannerSubtitle: { fontSize: 18, color: '#A080C0', fontWeight: '500' },
   section: { gap: 10 },
@@ -125,7 +129,6 @@ const styles = StyleSheet.create({
   },
   playerRowDead: { opacity: 0.55 },
   playerInfo: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  playerEmoji: { fontSize: 24 },
   playerName: { fontSize: 16, color: '#E8D5FF', fontWeight: '600' },
   playerNameDead: { textDecorationLine: 'line-through', color: '#7A5A9A' },
   playerRole: { fontSize: 12, color: '#6A4A8A', marginTop: 2 },

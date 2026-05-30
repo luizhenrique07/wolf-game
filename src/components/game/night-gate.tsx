@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 
 interface Props {
   playerName: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
   onReady: () => void;
   readyLabel?: string;
 }
@@ -15,7 +15,7 @@ export function NightGate({ playerName, subtitle, onReady, readyLabel = "I'm rea
         <Text style={styles.moon}>🌙</Text>
         <Text style={styles.instruction}>Pass the device to</Text>
         <Text style={styles.name}>{playerName}</Text>
-        {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
+        {subtitle && <View style={styles.subtitleRow}>{subtitle}</View>}
         <Text style={styles.hint}>Everyone else — look away.</Text>
       </View>
 
@@ -59,6 +59,11 @@ const styles = StyleSheet.create({
     color: '#E8D5FF',
     fontWeight: '800',
     textAlign: 'center',
+  },
+  subtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   subtitle: {
     fontSize: 14,

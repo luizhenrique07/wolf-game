@@ -15,20 +15,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/game/context';
 import { dealRoles, validateRoleCounts } from '@/game/engine';
 import type { Role } from '@/game/types';
+import { RoleIcon, WolfIcon } from '@/components/game/icons';
 
 const MIN_PLAYERS = 4;
 
 interface RoleCounterProps {
   label: string;
-  emoji: string;
+  role: Exclude<Role, 'villager'>;
   value: number;
   onChange: (v: number) => void;
 }
 
-function RoleCounter({ label, emoji, value, onChange }: RoleCounterProps) {
+function RoleCounter({ label, role, value, onChange }: RoleCounterProps) {
   return (
     <View style={styles.counter}>
-      <Text style={styles.counterEmoji}>{emoji}</Text>
+      <RoleIcon role={role} size={22} color="#A080C0" />
       <Text style={styles.counterLabel}>{label}</Text>
       <View style={styles.counterControls}>
         <Pressable
@@ -119,7 +120,8 @@ export default function LobbyScreen() {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.header}>
-            <Text style={styles.title}>🐺 Wolf</Text>
+            <WolfIcon size={48} color="#C090FF" />
+            <Text style={styles.title}>Wolf</Text>
             <Text style={styles.subtitle}>A social deduction game</Text>
           </View>
 
@@ -159,24 +161,24 @@ export default function LobbyScreen() {
             <Text style={styles.sectionTitle}>Roles</Text>
             <RoleCounter
               label="Wolves"
-              emoji="🐺"
+              role="wolf"
               value={roleCounts.wolf}
               onChange={(v) => updateRole('wolf', v)}
             />
             <RoleCounter
               label="Hunters"
-              emoji="🏹"
+              role="hunter"
               value={roleCounts.hunter}
               onChange={(v) => updateRole('hunter', v)}
             />
             <RoleCounter
               label="Oracles"
-              emoji="🔮"
+              role="oracle"
               value={roleCounts.oracle}
               onChange={(v) => updateRole('oracle', v)}
             />
             <View style={styles.villagerRow}>
-              <Text style={styles.villagerEmoji}>🧑‍🌾</Text>
+              <RoleIcon role="villager" size={22} color="#6A508A" />
               <Text style={styles.villagerLabel}>Villagers</Text>
               <Text style={styles.villagerCount}>{villagerCount}</Text>
             </View>
@@ -255,7 +257,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 10,
   },
-  counterEmoji: { fontSize: 20 },
   counterLabel: { flex: 1, color: '#A080C0', fontSize: 16, fontWeight: '500' },
   counterControls: { flexDirection: 'row', alignItems: 'center', gap: 16 },
   counterBtn: {
@@ -285,7 +286,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 10,
   },
-  villagerEmoji: { fontSize: 20 },
   villagerLabel: { flex: 1, color: '#6A508A', fontSize: 16, fontWeight: '500' },
   villagerCount: { color: '#7A5AAA', fontSize: 20, fontWeight: '700' },
   villagerHint: { color: '#3A2A5A', fontSize: 12, textAlign: 'center' },
