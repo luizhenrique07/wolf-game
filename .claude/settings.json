@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc *)",
-      "Bash(npx expo *)"
+      "Bash(npx expo *)",
+      "Bash(npm install *)",
+      "Bash(node /Users/luizhenriquesoares/Projects/wolf-game/scripts/generate-icon.js)"
     ]
   },
   "enabledPlugins": {
