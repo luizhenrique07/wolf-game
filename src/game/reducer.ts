@@ -17,17 +17,20 @@ export const initialGameState: GameState = {
   lastNightSummary: null,
   votes: {},
   winner: null,
+  discussionNextPhase: 'vote',
 };
 
 function assertNever(action: never): never {
   throw new Error(`Unhandled action: ${JSON.stringify(action)}`);
 }
 
-function startNight(state: GameState): GameState {
+// Enter the pre-night discussion phase (1m30s before characters act).
+function startPreNightDiscussion(state: GameState): GameState {
   const nightTurns = buildNightQueue(state.players);
   return {
     ...state,
-    phase: 'night_action',
+    phase: 'discussion',
+    discussionNextPhase: 'night_action',
     nightTurns,
     nightTurnIndex: 0,
   };
@@ -50,12 +53,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       if (nextIndex < state.players.length) {
         return { ...state, revealIndex: nextIndex };
       }
-      // All players have seen their roles — begin night 1
-      return startNight(state);
+      // All players have seen their roles — discussion before night 1
+      return startPreNightDiscussion(state);
     }
 
     case 'START_NIGHT': {
-      return startNight({ ...state, round: state.round + 1 });
+      return startPreNightDiscussion({ ...state, round: state.round + 1 });
     }
 
     case 'SUBMIT_NIGHT_ACTION': {
@@ -65,7 +68,6 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const nextTurnIndex = state.nightTurnIndex + 1;
 
       if (nextTurnIndex < state.nightTurns.length) {
-        // More actors remain
         return {
           ...state,
           nightTurns: updatedTurns,
@@ -90,10 +92,22 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
 
     case 'ACKNOWLEDGE_NIGHT_SUMMARY': {
-      return { ...state, phase: 'discussion' };
+      return {
+        ...state,
+        phase: 'discussion',
+        discussionNextPhase: 'vote',
+      };
     }
 
     case 'DISCUSSION_ENDED': {
+      if (state.discussionNextPhase === 'night_action') {
+        // Pre-night discussion finished — begin night actions (queue already built)
+        return {
+          ...state,
+          phase: 'night_action',
+        };
+      }
+      // Day discussion finished — go to vote
       return { ...state, phase: 'vote', votes: {} };
     }
 
@@ -125,18 +139,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         };
       }
 
-      // Start next night
-      const nightTurns = buildNightQueue(updatedPlayers);
-      return {
+      // After vote — pre-night discussion before next round
+      return startPreNightDiscussion({
         ...state,
         players: updatedPlayers,
         round: state.round + 1,
-        phase: 'night_action',
-        nightTurns,
-        nightTurnIndex: 0,
         lastNightSummary: null,
         votes: {},
-      };
+      });
     }
 
     case 'RESET_GAME': {

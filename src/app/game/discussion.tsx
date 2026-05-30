@@ -10,11 +10,13 @@ import { DISCUSSION_DURATION_MS } from '@/game/constants';
 export default function DiscussionScreen() {
   const { state, dispatch, alivePlayers } = useGame();
 
+  const isPreNight = state.discussionNextPhase === 'night_action';
+
   const handleExpire = useCallback(() => {
     dispatch({ type: 'DISCUSSION_ENDED' });
   }, [dispatch]);
 
-  const { remainingMs, progress, start, isRunning } = useTimer({
+  const { remainingMs, progress, start } = useTimer({
     durationMs: DISCUSSION_DURATION_MS,
     onExpire: handleExpire,
     autoStart: true,
@@ -28,6 +30,8 @@ export default function DiscussionScreen() {
   useEffect(() => {
     if (state.phase === 'vote') {
       router.replace('/game/vote');
+    } else if (state.phase === 'night_action') {
+      router.replace('/game/night-action');
     }
   }, [state.phase]);
 
@@ -35,7 +39,9 @@ export default function DiscussionScreen() {
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
-          <Text style={styles.title}>Discussion</Text>
+          <Text style={styles.title}>
+            {isPreNight ? 'Night is falling…' : 'Discussion'}
+          </Text>
           <Text style={styles.subtitle}>Round {state.round}</Text>
         </View>
 
@@ -44,7 +50,9 @@ export default function DiscussionScreen() {
         </View>
 
         <Text style={styles.hint}>
-          Discuss who you think the Wolf is. The player with the most votes will be eliminated.
+          {isPreNight
+            ? 'Last chance to talk before the night begins.'
+            : 'Discuss who you think the Wolf is. The player with the most votes will be eliminated.'}
         </Text>
 
         <View style={styles.playerSection}>
@@ -60,7 +68,9 @@ export default function DiscussionScreen() {
           style={({ pressed }) => [styles.skipBtn, pressed && styles.pressed]}
           onPress={() => dispatch({ type: 'DISCUSSION_ENDED' })}
         >
-          <Text style={styles.skipBtnText}>Skip to Vote →</Text>
+          <Text style={styles.skipBtnText}>
+            {isPreNight ? 'Begin Night 🌙' : 'Skip to Vote →'}
+          </Text>
         </Pressable>
       </ScrollView>
     </SafeAreaView>

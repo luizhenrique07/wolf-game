@@ -21,7 +21,9 @@ export default function RoleRevealScreen() {
 
   // Navigate away when phase changes
   useEffect(() => {
-    if (state.phase === "night_action") {
+    if (state.phase === "discussion") {
+      router.replace("/game/discussion");
+    } else if (state.phase === "night_action") {
       router.replace("/game/night-action");
     }
   }, [state.phase]);

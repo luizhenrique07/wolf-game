@@ -60,6 +60,7 @@ export interface GameState {
   lastNightSummary: NightSummary | null;
   votes: VoteTally;
   winner: Winner;
+  discussionNextPhase: 'vote' | 'night_action';
 }
 
 export type GameAction =
