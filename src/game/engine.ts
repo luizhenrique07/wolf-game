@@ -39,23 +39,26 @@ export function dealRoles(names: string[], roleCounts: Record<Role, number>): Pl
 
 export function buildNightQueue(players: Player[]): NightTurn[] {
   const turns: NightTurn[] = [];
+  const alive = players.filter((p) => p.isAlive);
 
-  // Wolf always acts
-  const wolves = players.filter((p) => p.isAlive && p.role === 'wolf');
-  for (const wolf of wolves) {
-    turns.push({ actorId: wolf.id, actionType: 'wolf_kill', targetId: null });
+  // Wolves first — can act or skip
+  for (const p of alive.filter((p) => p.role === 'wolf')) {
+    turns.push({ actorId: p.id, actionType: 'wolf_kill', targetId: null });
   }
 
-  // Oracle acts if alive and hasn't used ability
-  const oracle = players.find((p) => p.isAlive && p.role === 'oracle' && !p.hasUsedAbility);
-  if (oracle) {
-    turns.push({ actorId: oracle.id, actionType: 'oracle_check', targetId: null });
+  // Oracle — can act (if unused) or skip
+  for (const p of alive.filter((p) => p.role === 'oracle')) {
+    turns.push({ actorId: p.id, actionType: p.hasUsedAbility ? 'no_action' : 'oracle_check', targetId: null });
   }
 
-  // Hunter acts if alive and hasn't used ability
-  const hunter = players.find((p) => p.isAlive && p.role === 'hunter' && !p.hasUsedAbility);
-  if (hunter) {
-    turns.push({ actorId: hunter.id, actionType: 'hunter_kill', targetId: null });
+  // Hunter — can act (if unused) or skip
+  for (const p of alive.filter((p) => p.role === 'hunter')) {
+    turns.push({ actorId: p.id, actionType: p.hasUsedAbility ? 'no_action' : 'hunter_kill', targetId: null });
+  }
+
+  // Villagers — no action
+  for (const p of alive.filter((p) => p.role === 'villager')) {
+    turns.push({ actorId: p.id, actionType: 'no_action', targetId: null });
   }
 
   return turns;
@@ -105,9 +108,10 @@ export function applyNightSummary(
   const hunterKill = turns.find((t) => t.actionType === 'hunter_kill');
   if (hunterKill?.targetId) killedIds.add(hunterKill.targetId);
 
+  // Only mark ability used if the player actually acted (non-null target)
   const usedAbilityIds = new Set<PlayerId>(
     turns
-      .filter((t) => t.actionType === 'oracle_check' || t.actionType === 'hunter_kill')
+      .filter((t) => (t.actionType === 'oracle_check' || t.actionType === 'hunter_kill') && t.targetId !== null)
       .map((t) => t.actorId)
   );
 

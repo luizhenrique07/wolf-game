@@ -37,4 +37,5 @@ export const NIGHT_ACTION_INSTRUCTIONS: Record<string, string> = {
   wolf_kill: 'Choose a player to eliminate tonight.',
   hunter_kill: 'You have one shot. Choose a player to eliminate.',
   oracle_check: 'Choose a player to investigate. You will learn if they are the Wolf.',
+  no_action: 'You have no special ability this night. Stay quiet.',
 };

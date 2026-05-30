@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Pressable, StyleSheet, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/game/context';
+import { NightGate } from '@/components/game/night-gate';
 import { VoteButton } from '@/components/game/vote-button';
 import type { PlayerId } from '@/game/types';
 
 export default function VoteScreen() {
   const { state, dispatch, alivePlayers } = useGame();
-  // Track the currently highlighted vote (last tap) for visual feedback
-  const [highlight, setHighlight] = useState<PlayerId | null>(null);
+
+  const [voterIndex, setVoterIndex] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+  const [selected, setSelected] = useState<PlayerId | null>(null);
+  // Collect all votes locally; dispatch to reducer only when everyone has voted
+  const [localVotes, setLocalVotes] = useState<Record<PlayerId, PlayerId | null>>({});
 
   useEffect(() => {
     if (state.phase === 'game_over') {
@@ -19,74 +24,92 @@ export default function VoteScreen() {
     }
   }, [state.phase]);
 
-  // Count votes per target
-  const voteCounts: Record<PlayerId, number> = {};
-  for (const targetId of Object.values(state.votes)) {
-    if (targetId) {
-      voteCounts[targetId] = (voteCounts[targetId] ?? 0) + 1;
+  const currentVoter = alivePlayers[voterIndex];
+  const nextVoter = alivePlayers[voterIndex + 1];
+  const isLastVoter = voterIndex === alivePlayers.length - 1;
+
+  // Targets: all alive players (a player can technically vote for anyone)
+  const targets = alivePlayers.filter((p) => p.id !== currentVoter?.id);
+
+  const handleVote = () => {
+    if (!currentVoter) return;
+
+    const updatedVotes = { ...localVotes, [currentVoter.id]: selected };
+
+    if (isLastVoter) {
+      // All players have voted — dispatch everything and submit.
+      // useReducer processes dispatches sequentially in the same event, so
+      // SUBMIT_VOTES sees the fully populated votes state.
+      for (const [voterId, targetId] of Object.entries(updatedVotes)) {
+        dispatch({ type: 'CAST_VOTE', voterId, targetId });
+      }
+      dispatch({ type: 'SUBMIT_VOTES' });
+    } else {
+      setLocalVotes(updatedVotes);
+      setVoterIndex((i) => i + 1);
+      setIsReady(false);
+      setSelected(null);
     }
+  };
+
+  if (!currentVoter) return null;
+
+  // Gate screen — pass device to current voter
+  if (!isReady) {
+    return (
+      <NightGate
+        playerName={currentVoter.name}
+        subtitle={`Vote ${voterIndex + 1} of ${alivePlayers.length}`}
+        onReady={() => setIsReady(true)}
+        readyLabel="Cast my vote"
+      />
+    );
   }
 
-  const totalVotes = Object.keys(state.votes).length;
-  const aliveCount = alivePlayers.length;
-
-  const handleVote = (targetId: PlayerId) => {
-    setHighlight(targetId);
-    // Use the highlight as the voter id (simplest public voting: last tap wins per voter)
-    // In public voting, each new tap adds/updates a vote from that player
-    // We use the target itself as a key since we don't track individual voter identity
-    // Instead we track a running vote list keyed by unique tap IDs
-    const voterId = `vote_${Date.now()}`;
-    dispatch({ type: 'CAST_VOTE', voterId, targetId });
-  };
-
-  const handleFinalize = () => {
-    if (totalVotes === 0) {
-      Alert.alert('No votes cast', 'At least one vote must be cast before finalizing.');
-      return;
-    }
-    dispatch({ type: 'SUBMIT_VOTES' });
-  };
-
+  // Voting screen for current voter
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.header}>
-          <Text style={styles.title}>Vote</Text>
-          <Text style={styles.subtitle}>
-            Tap a player to vote. Most votes = eliminated. Tie = no elimination.
-          </Text>
-        </View>
-
-        <View style={styles.tally}>
-          <Text style={styles.tallyText}>{totalVotes} vote{totalVotes !== 1 ? 's' : ''} cast</Text>
+          <Text style={styles.title}>{currentVoter.name}</Text>
+          <Text style={styles.subtitle}>Who do you vote to eliminate?</Text>
         </View>
 
         <View style={styles.list}>
-          {alivePlayers.map((p) => (
+          {targets.map((p) => (
             <VoteButton
               key={p.id}
               playerId={p.id}
               name={p.name}
-              voteCount={voteCounts[p.id] ?? 0}
-              isSelected={highlight === p.id}
-              onPress={handleVote}
+              voteCount={0}
+              isSelected={selected === p.id}
+              onPress={setSelected}
             />
           ))}
         </View>
 
-        <View style={styles.hint}>
-          <Text style={styles.hintText}>
-            Each player physically taps the screen to cast their vote. Votes are public.
-          </Text>
-        </View>
+        <View style={styles.actions}>
+          <Pressable
+            style={({ pressed }) => [styles.abstainBtn, pressed && styles.pressed]}
+            onPress={() => setSelected(null)}
+          >
+            <Text style={styles.abstainBtnText}>Abstain</Text>
+          </Pressable>
 
-        <Pressable
-          style={({ pressed }) => [styles.finalizeBtn, pressed && styles.pressed]}
-          onPress={handleFinalize}
-        >
-          <Text style={styles.finalizeBtnText}>Finalize Votes ⚖️</Text>
-        </Pressable>
+          <Pressable
+            style={({ pressed }) => [
+              styles.voteBtn,
+              pressed && styles.pressed,
+            ]}
+            onPress={handleVote}
+          >
+            <Text style={styles.voteBtnText}>
+              {isLastVoter
+                ? 'Submit Votes'
+                : `Vote → pass to ${nextVoter.name}`}
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -94,30 +117,21 @@ export default function VoteScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#080510' },
-  scroll: { padding: 24, gap: 20, paddingBottom: 48 },
-  header: { gap: 8 },
+  scroll: { padding: 24, gap: 24, paddingBottom: 48 },
+  header: { gap: 6 },
   title: { fontSize: 28, color: '#E8D5FF', fontWeight: '800' },
   subtitle: { fontSize: 14, color: '#6A4A8A', lineHeight: 22 },
-  tally: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#1A0D2E',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
+  list: { gap: 10 },
+  actions: { gap: 12 },
+  abstainBtn: {
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#3A2A5A',
   },
-  tallyText: { color: '#7A5AAA', fontSize: 13, fontWeight: '600' },
-  list: { gap: 10 },
-  hint: {
-    backgroundColor: '#100820',
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#1A0D2E',
-  },
-  hintText: { color: '#4A2D6A', fontSize: 13, textAlign: 'center', lineHeight: 20 },
-  finalizeBtn: {
+  abstainBtnText: { color: '#6A4A8A', fontSize: 15, fontWeight: '600' },
+  voteBtn: {
     backgroundColor: '#8B2020',
     borderRadius: 16,
     paddingVertical: 20,
@@ -125,6 +139,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#C84B4B',
   },
-  finalizeBtnText: { color: '#FFD0D0', fontSize: 18, fontWeight: '800' },
+  voteBtnText: { color: '#FFD0D0', fontSize: 18, fontWeight: '800' },
   pressed: { opacity: 0.7 },
 });

@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/game/context';
 import { ROLE_LABELS, TEAM_LABELS } from '@/game/constants';
 import { ROLE_TEAM } from '@/game/types';
-import { RoleIcon, WolfIcon, VillagerIcon } from '@/components/game/icons';
+import { RoleIcon, WolfIcon } from '@/components/game/icons';
 
 function WinnerBanner({ winner }: { winner: 'wolves' | 'village' }) {
   const scale = useSharedValue(0.5);
@@ -33,13 +33,10 @@ function WinnerBanner({ winner }: { winner: 'wolves' | 'village' }) {
 
   return (
     <Animated.View style={[styles.banner, isWolves ? styles.bannerWolf : styles.bannerVillage, style]}>
-      {isWolves ? (
-        <WolfIcon size={64} color={isWolves ? '#E04040' : '#40C060'} />
-      ) : (
-        <VillagerIcon size={64} color="#40C060" />
-      )}
-      <Text style={styles.bannerTitle}>{TEAM_LABELS[winner]}</Text>
-      <Text style={styles.bannerSubtitle}>{isWolves ? 'wins!' : 'wins!'}</Text>
+      <WolfIcon size={64} color={isWolves ? '#40C060' : '#E04040'} />
+      <Text style={[styles.bannerTitle, isWolves ? styles.bannerTitleWolf : styles.bannerTitleVillage]}>
+        {isWolves ? 'Wolf wins!' : 'Wolf loses!'}
+      </Text>
     </Animated.View>
   );
 }
@@ -103,10 +100,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     marginTop: 16,
   },
-  bannerWolf: { backgroundColor: '#2A0505', borderColor: '#8B2020' },
-  bannerVillage: { backgroundColor: '#052A0A', borderColor: '#1A7A2A' },
-  bannerTitle: { fontSize: 32, color: '#E8D5FF', fontWeight: '900', letterSpacing: -0.5 },
-  bannerSubtitle: { fontSize: 18, color: '#A080C0', fontWeight: '500' },
+  bannerWolf: { backgroundColor: '#052A0A', borderColor: '#1A7A2A' },
+  bannerVillage: { backgroundColor: '#2A0505', borderColor: '#8B2020' },
+  bannerTitle: { fontSize: 32, fontWeight: '900', letterSpacing: -0.5 },
+  bannerTitleWolf: { color: '#40C060' },
+  bannerTitleVillage: { color: '#E04040' },
   section: { gap: 10 },
   sectionTitle: {
     fontSize: 12,

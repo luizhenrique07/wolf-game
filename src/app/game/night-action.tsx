@@ -13,17 +13,14 @@ export default function NightActionScreen() {
   const { state, dispatch, alivePlayers, currentNightTurn, currentNightActor } = useGame();
   const [isReady, setIsReady] = useState(false);
   const [selected, setSelected] = useState<PlayerId | null>(null);
-  // Oracle reveal state: after confirming, show oracle's private result
   const [oracleResult, setOracleResult] = useState<{ targetName: string; isWolf: boolean } | null>(null);
 
-  // Reset gate & selection when the turn index changes
   useEffect(() => {
     setIsReady(false);
     setSelected(null);
     setOracleResult(null);
   }, [state.nightTurnIndex]);
 
-  // Navigate when phase changes to night_summary or game_over
   useEffect(() => {
     if (state.phase === 'night_summary') {
       router.replace('/game/night-summary');
@@ -34,31 +31,27 @@ export default function NightActionScreen() {
 
   if (!currentNightTurn || !currentNightActor) return null;
 
-  // Available targets: alive players excluding the actor
+  const isNoAction = currentNightTurn.actionType === 'no_action';
+  const isOracle = currentNightTurn.actionType === 'oracle_check';
   const targets = alivePlayers.filter((p) => p.id !== currentNightActor.id);
 
-  const isOracle = currentNightTurn.actionType === 'oracle_check';
+  const submitAction = (targetId: PlayerId | null) => {
+    dispatch({ type: 'SUBMIT_NIGHT_ACTION', targetId });
+  };
 
   const handleConfirm = () => {
     if (!selected) return;
-
     if (isOracle) {
       const target = state.players.find((p) => p.id === selected);
       if (target) {
         setOracleResult({ targetName: target.name, isWolf: target.role === 'wolf' });
-        return; // Don't dispatch yet — wait for oracle to tap "Got it"
+        return;
       }
     }
-
-    dispatch({ type: 'SUBMIT_NIGHT_ACTION', targetId: selected });
+    submitAction(selected);
   };
 
-  const handleOracleAcknowledge = () => {
-    if (!selected) return;
-    dispatch({ type: 'SUBMIT_NIGHT_ACTION', targetId: selected });
-  };
-
-  // Gate screen
+  // Gate screen — no role shown, role is secret
   if (!isReady) {
     return (
       <NightGate
@@ -73,17 +66,17 @@ export default function NightActionScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
-          <Text style={styles.oracleTitle}>🔮 Oracle's Vision</Text>
+          <Text style={styles.oracleTitle}>Oracle's Vision</Text>
           <View style={styles.oracleCard}>
             <Text style={styles.oracleTargetName}>{oracleResult.targetName}</Text>
             <Text style={[styles.oracleVerdict, oracleResult.isWolf ? styles.oracleWolf : styles.oracleVillage]}>
-              {oracleResult.isWolf ? '🐺 IS THE WOLF' : '✅ IS NOT THE WOLF'}
+              {oracleResult.isWolf ? 'IS THE WOLF' : 'IS NOT THE WOLF'}
             </Text>
           </View>
           <Text style={styles.oracleHint}>Remember this — you cannot check again.</Text>
           <Pressable
             style={({ pressed }) => [styles.confirmBtn, pressed && styles.pressed]}
-            onPress={handleOracleAcknowledge}
+            onPress={() => submitAction(selected)}
           >
             <Text style={styles.confirmBtnText}>Got it</Text>
           </Pressable>
@@ -92,7 +85,32 @@ export default function NightActionScreen() {
     );
   }
 
-  // Action screen
+  // No-action screen (villager or already-used ability)
+  if (isNoAction) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.noActionContainer}>
+          <View style={styles.noActionContent}>
+            <RoleIcon role={currentNightActor.role} size={56} color="#3A2060" />
+            <Text style={styles.actorName}>{currentNightActor.name}</Text>
+            <View style={styles.roleLabelRow}>
+              <RoleIcon role={currentNightActor.role} size={14} color="#5A3A8A" />
+              <Text style={styles.roleLabel}>{ROLE_LABELS[currentNightActor.role]}</Text>
+            </View>
+            <Text style={styles.noActionText}>{NIGHT_ACTION_INSTRUCTIONS.no_action}</Text>
+          </View>
+          <Pressable
+            style={({ pressed }) => [styles.confirmBtn, pressed && styles.pressed]}
+            onPress={() => submitAction(null)}
+          >
+            <Text style={styles.confirmBtnText}>Continue</Text>
+          </Pressable>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Active action screen (wolf / hunter / oracle with unused ability)
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
@@ -115,15 +133,23 @@ export default function NightActionScreen() {
           />
         </View>
 
-        <Pressable
-          style={({ pressed }) => [styles.confirmBtn, !selected && styles.confirmBtnDisabled, pressed && selected && styles.pressed]}
-          onPress={handleConfirm}
-          disabled={!selected}
-        >
-          <Text style={styles.confirmBtnText}>
-            {isOracle ? 'Investigate' : 'Confirm'}
-          </Text>
-        </Pressable>
+        <View style={styles.actionRow}>
+          <Pressable
+            style={({ pressed }) => [styles.skipBtn, pressed && styles.pressed]}
+            onPress={() => submitAction(null)}
+          >
+            <Text style={styles.skipBtnText}>Skip</Text>
+          </Pressable>
+          <Pressable
+            style={({ pressed }) => [styles.confirmBtn, styles.confirmBtnFlex, !selected && styles.confirmBtnDisabled, pressed && selected && styles.pressed]}
+            onPress={handleConfirm}
+            disabled={!selected}
+          >
+            <Text style={styles.confirmBtnText}>
+              {isOracle ? 'Investigate' : 'Confirm'}
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -132,12 +158,43 @@ export default function NightActionScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#080510' },
   container: { flex: 1, paddingHorizontal: 24, paddingVertical: 32, gap: 20 },
+  noActionContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    justifyContent: 'space-between',
+  },
+  noActionContent: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
+  },
+  noActionText: {
+    fontSize: 16,
+    color: '#6A4A8A',
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: 16,
+  },
   header: { gap: 6 },
   roleLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   roleLabel: { fontSize: 13, color: '#6A4A9A', textTransform: 'uppercase', letterSpacing: 2 },
   actorName: { fontSize: 28, color: '#E8D5FF', fontWeight: '800' },
   instruction: { fontSize: 16, color: '#8060A0', lineHeight: 24, marginTop: 4 },
+  spacer: { flex: 1 },
   listArea: { flex: 1 },
+  actionRow: { flexDirection: 'row', gap: 12 },
+  skipBtn: {
+    backgroundColor: '#1A0D2E',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#3A2A5A',
+  },
+  skipBtnText: { color: '#6A4A8A', fontSize: 16, fontWeight: '600' },
   confirmBtn: {
     backgroundColor: '#5A3A9A',
     borderRadius: 16,
@@ -146,6 +203,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#8A5ADA',
   },
+  confirmBtnFlex: { flex: 1 },
   confirmBtnDisabled: {
     backgroundColor: '#1A0D2E',
     borderColor: '#2A1A4A',

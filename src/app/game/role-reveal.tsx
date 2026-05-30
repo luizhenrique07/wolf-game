@@ -11,7 +11,6 @@ export default function RoleRevealScreen() {
   const [isReady, setIsReady] = useState(false);
 
   const currentPlayer = state.players[state.revealIndex];
-  const nextPlayer = state.players[state.revealIndex + 1];
   const isLastPlayer = state.revealIndex === state.players.length - 1;
 
   // Reset gate when reveal index changes
@@ -59,9 +58,7 @@ export default function RoleRevealScreen() {
           onPress={() => dispatch({ type: "NEXT_REVEAL" })}
         >
           <Text style={styles.continueBtnText}>
-            {isLastPlayer
-              ? "Begin Night 🌙"
-              : `Done — pass to ${nextPlayer.name} →`}
+            {isLastPlayer ? "Begin Night 🌙" : `Done `}
           </Text>
         </Pressable>
       </View>

@@ -13,17 +13,17 @@ A single-device, pass-around Werewolf/Mafia-style social deduction game built in
 
 ## Game flow (per round)
 ```
-Lobby → Role Reveal → Discussion (pre-night, 1m30s) → Night Action → Night Summary
-                                ↑                                           ↓
-             Discussion (pre-night, 1m30s) ← Vote ← Discussion (day, 1m30s)
+Lobby → Role Reveal → Discussion (1m30s) → Vote → Night Action → Night Summary
+                                                ↑                       ↓
+                                         Discussion (1m30s) ←──────────┘
 ```
+One discussion + one vote per round, forever, until a win condition is met.
+
 - **Role Reveal**: each player privately sees their role on a gate screen (NightGate)
-- **Discussion**: 1m30s timer with skip button. Two variants driven by `state.discussionNextPhase`:
-  - `'night_action'` → pre-night ("Night is falling…") → goes to Night Action
-  - `'vote'` → day discussion → goes to Vote
-- **Night Action**: Wolf/Oracle/Hunter act privately one at a time, separated by NightGate screens
-- **Night Summary**: reveals who died; Oracle result was shown privately during Night Action
-- **Vote**: public tap voting, majority eliminates, tie = no elimination
+- **Discussion**: 1m30s countdown timer, skip button. Always leads to Vote.
+- **Vote**: per-player private voting via NightGate — each alive player sees gate → casts vote → passes device. After last voter, majority eliminates; tie = no one dies. Always leads to Night Action.
+- **Night Action**: all alive players cycle through a NightGate. Wolf/Oracle/Hunter can act or skip; Villagers (and used-ability players) see a "no action" screen. Round processes after last player.
+- **Night Summary**: reveals who died at night. "Begin Discussion" → increments round → Discussion.
 
 ## Architecture
 - **State machine**: `src/game/reducer.ts` (useReducer) + `src/game/context.tsx` (GameProvider/useGame hook)

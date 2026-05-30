@@ -19,7 +19,7 @@ export interface Player {
   hasUsedAbility: boolean;
 }
 
-export type NightActionType = 'wolf_kill' | 'hunter_kill' | 'oracle_check';
+export type NightActionType = 'wolf_kill' | 'hunter_kill' | 'oracle_check' | 'no_action';
 
 export interface NightTurn {
   actorId: PlayerId;
@@ -60,14 +60,13 @@ export interface GameState {
   lastNightSummary: NightSummary | null;
   votes: VoteTally;
   winner: Winner;
-  discussionNextPhase: 'vote' | 'night_action';
 }
 
 export type GameAction =
   | { type: 'START_ROLE_REVEAL'; players: Player[] }
   | { type: 'NEXT_REVEAL' }
   | { type: 'START_NIGHT' }
-  | { type: 'SUBMIT_NIGHT_ACTION'; targetId: PlayerId }
+  | { type: 'SUBMIT_NIGHT_ACTION'; targetId: PlayerId | null }
   | { type: 'ACKNOWLEDGE_NIGHT_SUMMARY' }
   | { type: 'DISCUSSION_ENDED' }
   | { type: 'CAST_VOTE'; voterId: PlayerId; targetId: PlayerId | null }
