@@ -1,6 +1,8 @@
 import { View } from 'react-native';
 import Constants from 'expo-constants';
 
+const ADS_ENABLED = false; // set to true to re-enable ads
+
 // 'storeClient' = Expo Go — native modules like AdMob are not available
 const isExpoGo = Constants.executionEnvironment === 'storeClient';
 
@@ -8,7 +10,7 @@ let BannerAd: any = null;
 let BannerAdSize: any = null;
 let TestIds: any = null;
 
-if (!isExpoGo) {
+if (!isExpoGo && ADS_ENABLED) {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const ads = require('react-native-google-mobile-ads');
   BannerAd = ads.BannerAd;
