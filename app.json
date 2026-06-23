@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "wolf-game",
+    "name": "Wolf Game",
     "slug": "wolf-game",
     "version": "1.0.2",
     "orientation": "portrait",
@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "wolf.game",
-      "versionCode": 5,
+      "versionCode": 6,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#080510"
