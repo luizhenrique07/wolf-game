@@ -16,11 +16,6 @@ import { useGame } from '@/game/context';
 import { dealRoles } from '@/game/engine';
 import type { Role } from '@/game/types';
 import { WolfIcon } from '@/components/game/icons';
-import { AdBanner } from '@/components/ads/AdBanner';
-
-// Replace with your real ad unit ID before publishing
-const LOBBY_BANNER_ID = 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';
-
 const MIN_PLAYERS = 4;
 
 // wolves = floor(n/3), always < n/2 so wolves never outnumber non-wolves
@@ -138,7 +133,6 @@ export default function LobbyScreen() {
             <Text style={styles.startBtnText}>Start Game</Text>
           </Pressable>
 
-          <AdBanner unitId={LOBBY_BANNER_ID} />
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

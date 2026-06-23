@@ -2,14 +2,10 @@ import { useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { AdBanner } from '@/components/ads/AdBanner';
 import { useGame } from '@/game/context';
 import { TimerRing } from '@/components/game/timer-ring';
 import { useTimer } from '@/game/use-timer';
 import { DISCUSSION_DURATION_MS } from '@/game/constants';
-
-// Replace with your real ad unit ID before publishing
-const DISCUSSION_BANNER_ID = 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy';
 
 export default function DiscussionScreen() {
   const { state, dispatch, alivePlayers } = useGame();
@@ -67,7 +63,6 @@ export default function DiscussionScreen() {
           <Text style={styles.skipBtnText}>Skip to Vote →</Text>
         </Pressable>
 
-        <AdBanner unitId={DISCUSSION_BANNER_ID} />
       </ScrollView>
     </SafeAreaView>
   );
