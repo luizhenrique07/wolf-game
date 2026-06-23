@@ -32,14 +32,7 @@
           }
         }
       ],
-      [
-        "react-native-google-mobile-ads",
-        {
-          "androidAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~xxxxxxxxxx",
-          "iosAppId": "ca-app-pub-xxxxxxxxxxxxxxxx~xxxxxxxxxx"
-        }
-      ],
-      "expo-font",
+"expo-font",
       "expo-image"
     ],
     "experiments": {
