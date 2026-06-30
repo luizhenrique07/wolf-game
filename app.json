@@ -33,7 +33,8 @@
         }
       ],
       "expo-font",
-      "expo-image"
+      "expo-image",
+      "./plugins/withGradleJvmArgs.js"
     ],
     "experiments": {
       "typedRoutes": true,
