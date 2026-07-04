@@ -15,6 +15,7 @@ export const initialGameState: GameState = {
   nightTurns: [],
   nightTurnIndex: 0,
   lastNightSummary: null,
+  lastVoteEliminated: null,
   votes: {},
   winner: null,
 };
@@ -81,6 +82,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         phase: 'discussion',
         round: state.round + 1,
         lastNightSummary: null,
+        lastVoteEliminated: null,
       };
     }
 
@@ -121,6 +123,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         nightTurns,
         nightTurnIndex: 0,
         votes: {},
+        lastVoteEliminated: eliminatedId,
       };
     }
 

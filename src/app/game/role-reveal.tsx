@@ -5,6 +5,7 @@ import { useGame } from "@/game/context";
 import { NightGate } from "@/components/game/night-gate";
 import { RoleCard } from "@/components/game/role-card";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AdBanner } from "@/components/game/AdBanner";
 
 export default function RoleRevealScreen() {
   const { state, dispatch } = useGame();
@@ -62,6 +63,7 @@ export default function RoleRevealScreen() {
           </Text>
         </Pressable>
       </View>
+      <AdBanner />
     </SafeAreaView>
   );
 }

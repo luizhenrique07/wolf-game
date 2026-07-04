@@ -10,6 +10,7 @@ import Animated, {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useGame } from '@/game/context';
 import { ResultBadge } from '@/components/game/result-badge';
+import { AdBanner } from '@/components/game/AdBanner';
 
 function FadeIn({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const opacity = useSharedValue(0);
@@ -42,6 +43,10 @@ export default function NightSummaryScreen() {
     ? state.players.find((p) => p.id === summary.killed)
     : null;
 
+  const votedOutPlayer = state.lastVoteEliminated
+    ? state.players.find((p) => p.id === state.lastVoteEliminated)
+    : null;
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -52,6 +57,16 @@ export default function NightSummaryScreen() {
         <FadeIn delay={300}>
           <Text style={styles.heading}>The night has ended…</Text>
         </FadeIn>
+
+        {votedOutPlayer && (
+          <FadeIn delay={500}>
+            <View style={styles.resultCard}>
+              <Text style={styles.killedName}>{votedOutPlayer.name}</Text>
+              <Text style={styles.killedText}>was voted out by the village.</Text>
+              <ResultBadge survived={false} delay={700} />
+            </View>
+          </FadeIn>
+        )}
 
         <FadeIn delay={700}>
           <View style={styles.resultCard}>
@@ -65,7 +80,7 @@ export default function NightSummaryScreen() {
               <>
                 <Text style={styles.safeEmoji}>🛡️</Text>
                 <Text style={styles.safeText}>The village slept safely.</Text>
-                <Text style={styles.safeSubtext}>No one was eliminated tonight.</Text>
+                <Text style={styles.safeSubtext}>No one was killed during the night.</Text>
               </>
             )}
           </View>
@@ -96,6 +111,7 @@ export default function NightSummaryScreen() {
           </Pressable>
         </FadeIn>
       </ScrollView>
+      <AdBanner />
     </SafeAreaView>
   );
 }

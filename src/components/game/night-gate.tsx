@@ -1,5 +1,7 @@
 import React, { type ReactNode } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { AdBanner } from "./AdBanner";
 
 interface Props {
   playerName: string;
@@ -29,15 +31,18 @@ export function NightGate({
         <Text style={styles.hint}>Everyone else — look away.</Text>
       </View>
 
-      <Pressable
-        style={({ pressed }) => [
-          styles.button,
-          pressed && styles.buttonPressed,
-        ]}
-        onPress={onReady}
-      >
-        <Text style={styles.buttonText}>{readyLabel}</Text>
-      </Pressable>
+      <SafeAreaView edges={["bottom"]} style={styles.bottom}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.button,
+            pressed && styles.buttonPressed,
+          ]}
+          onPress={onReady}
+        >
+          <Text style={styles.buttonText}>{readyLabel}</Text>
+        </Pressable>
+        <AdBanner />
+      </SafeAreaView>
     </View>
   );
 }
@@ -48,10 +53,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#080510",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 80,
+    paddingTop: 80,
     paddingHorizontal: 32,
     zIndex: 100,
   },
+  bottom: { width: "100%", gap: 12 },
   content: {
     flex: 1,
     alignItems: "center",

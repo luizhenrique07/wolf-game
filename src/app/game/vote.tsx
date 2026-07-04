@@ -6,6 +6,7 @@ import { useGame } from '@/game/context';
 import { NightGate } from '@/components/game/night-gate';
 import { VoteButton } from '@/components/game/vote-button';
 import type { PlayerId } from '@/game/types';
+import { AdBanner } from '@/components/game/AdBanner';
 
 export default function VoteScreen() {
   const { state, dispatch, alivePlayers } = useGame();
@@ -111,6 +112,7 @@ export default function VoteScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      <AdBanner />
     </SafeAreaView>
   );
 }

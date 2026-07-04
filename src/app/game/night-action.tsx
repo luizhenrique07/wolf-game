@@ -8,6 +8,7 @@ import { ActionTargetList } from '@/components/game/action-target-list';
 import type { PlayerId } from '@/game/types';
 import { ROLE_LABELS, NIGHT_ACTION_INSTRUCTIONS } from '@/game/constants';
 import { RoleIcon } from '@/components/game/icons';
+import { AdBanner } from '@/components/game/AdBanner';
 
 export default function NightActionScreen() {
   const { state, dispatch, alivePlayers, currentNightTurn, currentNightActor } = useGame();
@@ -81,6 +82,7 @@ export default function NightActionScreen() {
             <Text style={styles.confirmBtnText}>Got it</Text>
           </Pressable>
         </View>
+        <AdBanner />
       </SafeAreaView>
     );
   }
@@ -106,6 +108,7 @@ export default function NightActionScreen() {
             <Text style={styles.confirmBtnText}>Continue</Text>
           </Pressable>
         </View>
+        <AdBanner />
       </SafeAreaView>
     );
   }
@@ -151,6 +154,7 @@ export default function NightActionScreen() {
           </Pressable>
         </View>
       </View>
+      <AdBanner />
     </SafeAreaView>
   );
 }

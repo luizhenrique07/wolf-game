@@ -33,7 +33,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 20,
-    alignSelf: 'flex-start',
   },
   survived: {
     backgroundColor: '#1A3A1A',

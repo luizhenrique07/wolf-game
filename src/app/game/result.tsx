@@ -14,6 +14,7 @@ import { useGame } from '@/game/context';
 import { ROLE_LABELS, TEAM_LABELS } from '@/game/constants';
 import { ROLE_TEAM } from '@/game/types';
 import { RoleIcon, WolfIcon } from '@/components/game/icons';
+import { AdBanner } from '@/components/game/AdBanner';
 
 function WinnerBanner({ winner }: { winner: 'wolves' | 'village' }) {
   const scale = useSharedValue(0.5);
@@ -85,6 +86,7 @@ export default function ResultScreen() {
           <Text style={styles.playAgainBtnText}>Play Again 🐺</Text>
         </Pressable>
       </ScrollView>
+      <AdBanner />
     </SafeAreaView>
   );
 }

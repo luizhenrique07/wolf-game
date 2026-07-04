@@ -6,6 +6,7 @@ import { useGame } from '@/game/context';
 import { TimerRing } from '@/components/game/timer-ring';
 import { useTimer } from '@/game/use-timer';
 import { DISCUSSION_DURATION_MS } from '@/game/constants';
+import { AdBanner } from '@/components/game/AdBanner';
 
 export default function DiscussionScreen() {
   const { state, dispatch, alivePlayers } = useGame();
@@ -64,6 +65,7 @@ export default function DiscussionScreen() {
         </Pressable>
 
       </ScrollView>
+      <AdBanner />
     </SafeAreaView>
   );
 }

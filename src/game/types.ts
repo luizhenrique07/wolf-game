@@ -58,6 +58,7 @@ export interface GameState {
   nightTurns: NightTurn[];
   nightTurnIndex: number;
   lastNightSummary: NightSummary | null;
+  lastVoteEliminated: PlayerId | null;
   votes: VoteTally;
   winner: Winner;
 }

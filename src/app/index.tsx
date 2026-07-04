@@ -16,6 +16,7 @@ import { useGame } from '@/game/context';
 import { dealRoles } from '@/game/engine';
 import type { Role } from '@/game/types';
 import { WolfIcon } from '@/components/game/icons';
+import { AdBanner } from '@/components/game/AdBanner';
 const MIN_PLAYERS = 4;
 
 // wolves = floor(n/3), always < n/2 so wolves never outnumber non-wolves
@@ -135,6 +136,7 @@ export default function LobbyScreen() {
 
         </ScrollView>
       </KeyboardAvoidingView>
+      <AdBanner />
     </SafeAreaView>
   );
 }
