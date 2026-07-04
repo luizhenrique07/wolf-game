@@ -13,15 +13,16 @@ A single-device, pass-around Werewolf/Mafia-style social deduction game built in
 
 ## Game flow (per round)
 ```
-Lobby → Role Reveal → Discussion (1m30s) → Vote → Night Action → Night Summary
-                                                ↑                       ↓
-                                         Discussion (1m30s) ←──────────┘
+Lobby → Role Reveal → Discussion (1m30s) → Vote → Vote Result → Night Action → Night Summary
+                                                ↑                                     ↓
+                                         Discussion (1m30s) ←────────────────────────┘
 ```
 One discussion + one vote per round, forever, until a win condition is met.
 
 - **Role Reveal**: each player privately sees their role on a gate screen (NightGate)
 - **Discussion**: 1m30s countdown timer, skip button. Always leads to Vote.
-- **Vote**: per-player private voting via NightGate — each alive player sees gate → casts vote → passes device. After last voter, majority eliminates; tie = no one dies. Always leads to Night Action.
+- **Vote**: per-player private voting via NightGate — each alive player sees gate → casts vote → passes device. After last voter, majority eliminates; tie = no one dies. Always leads to Vote Result (or straight to Game Over if the vote ends the game).
+- **Vote Result**: shared screen announcing who (if anyone) was just voted out, shown to the whole group before the device starts passing around for night actions. "Continue to Night" → Night Action.
 - **Night Action**: all alive players cycle through a NightGate. Wolf/Oracle/Hunter can act or skip; Villagers (and used-ability players) see a "no action" screen. Round processes after last player.
 - **Night Summary**: reveals who died at night. "Begin Discussion" → increments round → Discussion.
 
@@ -41,6 +42,7 @@ One discussion + one vote per round, forever, until a win condition is met.
 | `src/app/game/night-summary.tsx` | Daytime results — who died |
 | `src/app/game/discussion.tsx` | Shared timer screen (pre-night and day) |
 | `src/app/game/vote.tsx` | Public voting |
+| `src/app/game/vote-result.tsx` | Shared screen announcing the vote outcome before night falls |
 | `src/app/game/result.tsx` | Game over, full role reveal |
 | `src/components/game/night-gate.tsx` | Full-screen privacy gate; accepts optional `role` prop to show role info |
 | `src/components/game/icons/index.tsx` | SVG icons for all 4 roles — `WolfIcon`, `VillagerIcon`, `HunterIcon`, `OracleIcon`, `RoleIcon` |

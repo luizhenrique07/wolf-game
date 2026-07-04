@@ -43,10 +43,6 @@ export default function NightSummaryScreen() {
     ? state.players.find((p) => p.id === summary.killed)
     : null;
 
-  const votedOutPlayer = state.lastVoteEliminated
-    ? state.players.find((p) => p.id === state.lastVoteEliminated)
-    : null;
-
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.scroll}>
@@ -57,16 +53,6 @@ export default function NightSummaryScreen() {
         <FadeIn delay={300}>
           <Text style={styles.heading}>The night has ended…</Text>
         </FadeIn>
-
-        {votedOutPlayer && (
-          <FadeIn delay={500}>
-            <View style={styles.resultCard}>
-              <Text style={styles.killedName}>{votedOutPlayer.name}</Text>
-              <Text style={styles.killedText}>was voted out by the village.</Text>
-              <ResultBadge survived={false} delay={700} />
-            </View>
-          </FadeIn>
-        )}
 
         <FadeIn delay={700}>
           <View style={styles.resultCard}>

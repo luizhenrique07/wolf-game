@@ -114,17 +114,19 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         return { ...state, players: updatedPlayers, phase: 'game_over', winner };
       }
 
-      // Vote always leads to night action
-      const nightTurns = buildNightQueue(updatedPlayers);
+      // Vote always leads to the vote result screen, then night action
       return {
         ...state,
         players: updatedPlayers,
-        phase: 'night_action',
-        nightTurns,
-        nightTurnIndex: 0,
+        phase: 'vote_result',
         votes: {},
         lastVoteEliminated: eliminatedId,
       };
+    }
+
+    case 'ACKNOWLEDGE_VOTE_RESULT': {
+      const nightTurns = buildNightQueue(state.players);
+      return { ...state, phase: 'night_action', nightTurns, nightTurnIndex: 0 };
     }
 
     case 'RESET_GAME': {

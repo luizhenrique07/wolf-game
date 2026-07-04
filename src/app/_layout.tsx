@@ -17,6 +17,7 @@ export default function RootLayout() {
           <Stack.Screen name="game/night-summary" />
           <Stack.Screen name="game/discussion" />
           <Stack.Screen name="game/vote" />
+          <Stack.Screen name="game/vote-result" />
           <Stack.Screen name="game/result" />
         </Stack>
       </GameProvider>

@@ -48,6 +48,7 @@ export type Phase =
   | 'night_summary'
   | 'discussion'
   | 'vote'
+  | 'vote_result'
   | 'game_over';
 
 export interface GameState {
@@ -72,4 +73,5 @@ export type GameAction =
   | { type: 'DISCUSSION_ENDED' }
   | { type: 'CAST_VOTE'; voterId: PlayerId; targetId: PlayerId | null }
   | { type: 'SUBMIT_VOTES' }
+  | { type: 'ACKNOWLEDGE_VOTE_RESULT' }
   | { type: 'RESET_GAME' };

@@ -20,8 +20,8 @@ export default function VoteScreen() {
   useEffect(() => {
     if (state.phase === 'game_over') {
       router.replace('/game/result');
-    } else if (state.phase === 'night_action') {
-      router.replace('/game/night-action');
+    } else if (state.phase === 'vote_result') {
+      router.replace('/game/vote-result');
     }
   }, [state.phase]);
 
